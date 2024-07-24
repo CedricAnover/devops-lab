@@ -1,0 +1,9 @@
+# Note: We are currently the 'admin' user from sysbox
+FROM nestybox/ubuntu-jammy-systemd-docker
+
+# SSH Provisioning
+COPY ./.ssh/id_rsa.pub /home/admin/.ssh/authorized_keys
+
+# SSH Configurations
+RUN echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+RUN echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config

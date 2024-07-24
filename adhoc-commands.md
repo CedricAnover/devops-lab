@@ -10,6 +10,8 @@ ssh-copy-id -i '.ssh/id_rsa.pub' admin@$(docker inspect -f '{{ .NetworkSettings.
 
 # SSH to System Container
 ssh admin@$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' server-1) -p 22
+# When Sysbox Image is provisioned with SSH Public Key. Without Password Prompt.
+ssh -i './.ssh/id_rsa' admin@$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' server-1) -p 22
 ```
 
 ## Docker
@@ -19,7 +21,7 @@ ssh admin@$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' server-1) -p 22
 ## Vagrant
 ```bash
 # Deploy
-vagrant up
+vagrant up --no-parallel
 
 # Destroy
 vagrant destroy -f
