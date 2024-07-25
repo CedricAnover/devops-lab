@@ -1,0 +1,23 @@
+---
+- name: Deploy Laboratory
+  hosts: localhost
+  vars_files:
+    - ../../vars_files/variables.yml
+  tasks:
+    - name: Message before Infrastructure Deployment
+      debug:
+        msg: |
+          "{{ hello_world }}"
+
+    - name: Message before Infrastructure Deployment
+      debug:
+        msg: |
+          "Deploying Laboratory"
+
+    - name: Deploy the Whole Infrastructure
+      shell: |
+        vagrant up
+      args:
+        # Change Working Directory Context
+        # Ref: https://devops.stackexchange.com/questions/3763/ansible-playbook-localhost-invocation-working-directory
+        chdir: "{{ lookup('env', 'PWD') }}"

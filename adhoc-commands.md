@@ -26,3 +26,17 @@ vagrant up --no-parallel
 # Destroy
 vagrant destroy -f
 ```
+
+## Ansible
+```bash
+# Test by Ping
+ansible -i inventory.yml all -m ping
+
+# Run a Playbook
+ansible-playbook -i inventory.yml ./playbooks/localhost_controller/vagrant_up.yml
+ansible-playbook -i inventory.yml ./playbooks/localhost_controller/vagrant_destroy.yml
+
+# Run a Playbook (Verbose)
+ansible-playbook -i inventory.yml -v ./playbooks/localhost_controller/vagrant_up.yml
+ansible-playbook -i inventory.yml -v ./playbooks/localhost_controller/vagrant_destroy.yml
+```

@@ -1,0 +1,21 @@
+---
+- name: Destroy Laboratory
+  hosts: localhost
+  vars_files:
+    # The lookup does not apply to this. 
+    # Have to manually change directory context.
+    - ../../vars_files/variables.yml
+
+  tasks:
+    - name: Message before Infrastructure Destruction
+      debug:
+        msg: |
+          "Destroying Laboratory"
+
+    - name: Destroy the Whole Infrastructure
+      shell: |
+        vagrant destroy -f
+      args:
+        # Change Working Directory Context
+        # Ref: https://devops.stackexchange.com/questions/3763/ansible-playbook-localhost-invocation-working-directory
+        chdir: "{{ lookup('env', 'PWD') }}"
