@@ -1,13 +1,15 @@
 DOCKER_SUBNET=172.18.0.0/16
+DOCKER_NET_NAME=devops-net
+DOCKER_RM_NET=docker network rm $(DOCKER_NET_NAME) 2>/dev/null || true
 
 all: deploy
 
 # Deploy Infrastructure
 deploy:
 	@echo "Deploying infrastructure..."
-	@echo "Creating Docker Network 'devops-net' ..."
-	@docker network rm devops-net 2>/dev/null || true
-	@docker network create --subnet=$(DOCKER_SUBNET) devops-net
+	@echo "Creating Docker Network '$(DOCKER_NET_NAME)' ..."
+	@$(DOCKER_RM_NET)
+	@docker network create --subnet=$(DOCKER_SUBNET) $(DOCKER_NET_NAME)
 	@ansible-playbook -i inventory.yml ./playbooks/localhost_controller/vagrant_up.yml
 
 # Test Ansible by Ping
@@ -20,8 +22,8 @@ test:
 destroy:
 	@echo "Destroying infrastructure..."
 	@ansible-playbook -i inventory.yml ./playbooks/localhost_controller/vagrant_destroy.yml
-	@echo "Cleaning Docker Network 'devops-net'"
-	@docker network rm devops-net 2>/dev/null || true
+	@echo "Cleaning Docker Network '$(DOCKER_NET_NAME)'"
+	@$(DOCKER_RM_NET)
 
 # Help
 help:
