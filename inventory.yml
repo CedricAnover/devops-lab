@@ -3,3 +3,24 @@ controllers:
     localhost:
       ansible_connection: local
       ansible_python_interpreter: "{{ansible_playbook_python}}"
+
+servers:
+  hosts:
+    server_1:
+      ansible_user: admin
+      ansible_host: 172.18.0.2
+      ansible_become: true
+      # Use ansible-vault to encrypt sensitive data in production.
+      # But for now, we'll skil it.
+      # This is the default password in sysbox.
+      ansible_become_password: admin
+      ansible_connection: ssh
+      ansible_ssh_private_key_file: ./.ssh/id_rsa
+
+    server_2:
+      ansible_user: admin
+      ansible_host: 172.18.0.3
+      ansible_become: true
+      ansible_become_password: admin
+      ansible_connection: ssh
+      ansible_ssh_private_key_file: ./.ssh/id_rsa

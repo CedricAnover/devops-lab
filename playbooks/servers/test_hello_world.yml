@@ -1,0 +1,7 @@
+---
+- name: Create Docker Hello World Containers for Testing
+  hosts: servers
+  become: true
+  tasks:
+    - name: Test with Hello World Containers
+      command: docker run -it hello-world

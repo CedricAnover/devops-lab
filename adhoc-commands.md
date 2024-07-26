@@ -39,6 +39,9 @@ ansible-playbook -i inventory.yml ./playbooks/localhost_controller/vagrant_destr
 # Run a Playbook (Verbose)
 ansible-playbook -i inventory.yml -v ./playbooks/localhost_controller/vagrant_up.yml
 ansible-playbook -i inventory.yml -v ./playbooks/localhost_controller/vagrant_destroy.yml
+
+# Run Playbooks for Servers
+ansible-playbook -i inventory.yml ./playbooks/servers/test_hello_world.yml
 ```
 
 ## Testing Docker Network - Static IP for System Containers
