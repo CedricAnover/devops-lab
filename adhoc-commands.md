@@ -1,5 +1,22 @@
 # Ad-hoc Commands
 
+## Make
+Using Make and Makefile just to make the lifecycle easier to manage.
+```bash
+# Deploy the infrastructure
+make deploy
+
+# Destroy the infrastructure
+make destroy
+
+# Test By Ping
+make test
+make test hosts=<ansible-group>
+
+# Get Help
+make help
+```
+
 ## SSH
 ```bash
 # Generate New SSH Key Pair

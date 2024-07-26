@@ -20,9 +20,9 @@
         # Ref: https://devops.stackexchange.com/questions/3763/ansible-playbook-localhost-invocation-working-directory
         chdir: "{{ lookup('env', 'PWD') }}"
     
-    - name: Destroy Docker Network
-      shell: |
-        docker network rm devops-net
-      args:
-        chdir: "{{ lookup('env', 'PWD') }}"
-      ignore_errors: yes
+    # - name: Destroy Docker Network
+    #   shell: |
+    #     docker network rm devops-net
+    #   args:
+    #     chdir: "{{ lookup('env', 'PWD') }}"
+    #   ignore_errors: yes

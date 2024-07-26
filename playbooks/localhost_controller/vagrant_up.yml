@@ -14,19 +14,19 @@
         msg: |
           "Deploying Laboratory"
 
-    - name: Destroy Docker Network
-      shell: |
-        docker network rm devops-net
-      args:
-        chdir: "{{ lookup('env', 'PWD') }}"
-      ignore_errors: yes
+    # - name: Destroy Docker Network
+    #   shell: |
+    #     docker network rm devops-net
+    #   args:
+    #     chdir: "{{ lookup('env', 'PWD') }}"
+    #   ignore_errors: yes
 
-    - name: Create Docker Network
-      shell: |
-        # TODO: Parameterize the Network Name and Subnet Address and Netmask
-        docker network create --subnet=172.18.0.0/16 devops-net
-      args:
-        chdir: "{{ lookup('env', 'PWD') }}"
+    # - name: Create Docker Network
+    #   shell: |
+    #     # TODO: Parameterize the Network Name and Subnet Address and Netmask
+    #     docker network create --subnet=172.18.0.0/16 devops-net
+    #   args:
+    #     chdir: "{{ lookup('env', 'PWD') }}"
 
     - name: Deploy the Whole Infrastructure
       shell: |
