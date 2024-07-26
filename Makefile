@@ -1,10 +1,13 @@
+DOCKER_SUBNET=172.18.0.0/16
+
+all: deploy
 
 # Deploy Infrastructure
 deploy:
 	@echo "Deploying infrastructure..."
 	@echo "Creating Docker Network 'devops-net' ..."
 	@docker network rm devops-net 2>/dev/null || true
-	@docker network create --subnet=172.18.0.0/16 devops-net
+	@docker network create --subnet=$(DOCKER_SUBNET) devops-net
 	@ansible-playbook -i inventory.yml ./playbooks/localhost_controller/vagrant_up.yml
 
 # Test Ansible by Ping
