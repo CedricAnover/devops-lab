@@ -77,3 +77,11 @@ docker run --runtime=sysbox-runc \
 docker image prune -f
 docker network prune -f
 ```
+
+
+## Task
+The `task` command for `Taskfile.yml` (alternative to `Makefile` and `make`).
+```bash
+# See all commands
+task --list
+```

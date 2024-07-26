@@ -1,0 +1,55 @@
+version: '3'
+tasks:
+  build:
+    desc: "Build Sysbox Image"
+    silent: true
+    cmd: docker build -t server -f Dockerfile.server .
+
+  clean-danglings:
+    desc: "Clean Docker Dangling Images"
+    silent: true
+    cmd: docker image prune -f
+
+  clean:
+    desc: "Clean Server Image and Dangling Images"
+    silent: true
+    deps:
+      - clean-danglings
+    cmds:
+      - docker rmi server 2>/dev/null || true
+
+  deploy:
+    desc: "Deploy Infrastructure Lab"
+    silent: true
+    deps:
+      - destroy
+    cmds:
+      - docker compose up -d --force-recreate
+
+  destroy:
+    desc: "Destroy Infrastructure Lab"
+    silent: true
+    cmd: docker compose down -v
+
+  ping:
+    desc: "Test by Ansible Ping"
+    silent: true
+    cmd: ansible -i inventory.yml all -m ping
+
+  test-hello-world:
+    desc: "Run Hello World Test Playbook"
+    silent: true
+    cmd: ansible-playbook -i inventory.yml ./playbooks/servers/test_hello_world.yml
+
+  status:
+    vars:
+      SEPARATOR: ======================================
+    desc: "Display Status of Infrastructure"
+    silent: true
+    cmds:
+      - echo -e "\n{{.SEPARATOR}} Compose Status {{.SEPARATOR}}\n"
+      - docker compose ls
+      - echo -e "\n{{.SEPARATOR}} Process Status {{.SEPARATOR}}\n"
+      - docker ps
+      - echo -e "\n{{.SEPARATOR}} Network Status {{.SEPARATOR}}\n"
+      - docker network ls
