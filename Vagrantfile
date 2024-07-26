@@ -1,8 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-ENV["LC_ALL"] = "en_US.UTF-8"
-
 require 'yaml'
 conf = YAML.load_file('config.yml')
 
@@ -14,10 +12,15 @@ end
 Vagrant.configure("2") do |config|
   config.vm.synced_folder '.', '/vagrant', disabled: true
 
-  config.vm.network :private_network, type: "dhcp", docker_network__internal: true
+  # Note: Need to manually (for now) create docker subnet before spinning up
+  # the system containers for allocating static IP Addresses.
 
   (1..conf["num_servers"]).each do |i|
     config.vm.define "server_#{i}" do |server|
+      server.vm.network :private_network, 
+        ip: "172.18.0.#{i+1}", 
+        name: "devops-net"
+
       server.vm.provider "docker" do |d|
         d.build_dir = "."
         d.dockerfile = "Dockerfile.server"

@@ -40,3 +40,20 @@ ansible-playbook -i inventory.yml ./playbooks/localhost_controller/vagrant_destr
 ansible-playbook -i inventory.yml -v ./playbooks/localhost_controller/vagrant_up.yml
 ansible-playbook -i inventory.yml -v ./playbooks/localhost_controller/vagrant_destroy.yml
 ```
+
+## Testing Docker Network - Static IP for System Containers
+```bash
+docker network create --subnet=172.18.0.0/16 devops-net
+
+docker build -t server -f Dockerfile.server .
+
+docker run --runtime=sysbox-runc \
+    -it --rm \
+    --hostname=test-host \
+    -P --net devops-net --ip 172.18.0.5 \
+    --name=test-container server
+
+# Clean
+docker image prune -f
+docker network prune -f
+```
