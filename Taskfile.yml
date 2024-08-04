@@ -4,6 +4,7 @@ silent: true
 
 env:
   ANSIBLE_EXE: "./.venv/bin/ansible"
+  ANSIBLE_PLAYBOOK_EXE: "./.venv/bin/ansible-playbook"
 
 dotenv: [".env"]
 
@@ -53,14 +54,14 @@ tasks:
 
   test-hello-world:
     desc: "Run Hello World Test Playbook"
-    cmd: ansible-playbook -i inventory.yml ./playbooks/servers/test_hello_world.yml
+    cmd: $ANSIBLE_PLAYBOOK_EXE -i inventory.yml ./playbooks/servers/test_hello_world.yml
 
   playbook-setup:
     desc: Setup Required Applications and Services
     vars:
       TS_AUTHKEY: $DEVOPS_REUSE_EPH_TAG_SYSCONT
     cmds:
-      - ansible-playbook -i inventory.yml --extra-vars TS_AUTHKEY={{.TS_AUTHKEY}} ./playbooks/servers/setup_apps_and_services.yml
+      - $ANSIBLE_PLAYBOOK_EXE -i inventory.yml --extra-vars TS_AUTHKEY={{.TS_AUTHKEY}} ./playbooks/servers/setup_apps_and_services.yml
 
   status:
     vars:
