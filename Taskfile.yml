@@ -5,6 +5,8 @@ silent: true
 env:
   ANSIBLE_EXE: "./.venv/bin/ansible"
 
+dotenv: [".env"]
+
 tasks:
   build:
     desc: "Build Sysbox Image"
@@ -55,8 +57,10 @@ tasks:
 
   playbook-setup:
     desc: Setup Required Applications and Services
+    vars:
+      TS_AUTHKEY: $DEVOPS_REUSE_EPH_TAG_SYSCONT
     cmds:
-      - ansible-playbook -i inventory.yml ./playbooks/servers/setup_apps_and_services.yml
+      - ansible-playbook -i inventory.yml --extra-vars TS_AUTHKEY={{.TS_AUTHKEY}} ./playbooks/servers/setup_apps_and_services.yml
 
   status:
     vars:

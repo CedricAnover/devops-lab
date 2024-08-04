@@ -1,6 +1,10 @@
 ---
 - name: Setup & install required applications & services
   hosts: servers
+  vars:
+    tailscale_env:
+      # Override these in Command-line
+      TS_AUTHKEY: ts-authkey
   tasks:
     - name: Install unzip
       apt:
@@ -40,6 +44,16 @@
         remote_src: yes
         creates: /usr/local/bin/consul
 
-    - name: Install Tailscale
+    - name: Run Tailscale Docker Container
       become: yes
-      shell: curl -fsSL https://tailscale.com/install.sh | sh
+      environment: "{{ tailscale_env }}"
+      shell: |
+        docker run -d \
+          --name=tailscaled \
+          -v /var/lib:/var/lib \
+          -v /dev/net/tun:/dev/net/tun \
+          --network=host \
+          --cap-add=NET_ADMIN \
+          --cap-add=NET_RAW \
+          --env TS_AUTHKEY="{{ TS_AUTHKEY }}" \
+          tailscale/tailscale
