@@ -1,20 +1,34 @@
 version: '3'
+
+silent: true
+
+env:
+  ANSIBLE_EXE: "./.venv/bin/ansible"
+
 tasks:
   build:
     desc: "Build Sysbox Image"
-    silent: true
     cmds: 
       - docker build -t server -f Dockerfile.server .
       - task: clean-danglings
 
+  generate-ssh-keys:
+    desc: Generate New SSH Key Pair
+    vars:
+      SSH_TYPE: rsa
+      ID_RSA_PATH: ./.ssh/id_rsa
+      SSH_USER: admin
+      SSH_HOST: controller
+    cmds:
+      - rm -rf ./.ssh/*
+      - ssh-keygen -t {{.SSH_TYPE}} -b 4096 -f {{.ID_RSA_PATH}} -C "{{.SSH_USER}}@{{.SSH_HOST}}" -N ""
+
   clean-danglings:
     desc: "Clean Docker Dangling Images"
-    silent: true
     cmd: docker image prune -f
 
   clean:
     desc: "Clean Server Image and Dangling Images"
-    silent: true
     deps:
       - clean-danglings
     cmds:
@@ -22,7 +36,6 @@ tasks:
 
   deploy:
     desc: "Deploy Infrastructure Lab"
-    silent: true
     deps:
       - destroy
     cmds:
@@ -30,24 +43,20 @@ tasks:
 
   destroy:
     desc: "Destroy Infrastructure Lab"
-    silent: true
     cmd: docker compose down -v
 
   ping:
     desc: "Test by Ansible Ping"
-    silent: true
-    cmd: ansible -i inventory.yml all -m ping
+    cmd: $ANSIBLE_EXE -i inventory.yml all -m ping
 
   test-hello-world:
     desc: "Run Hello World Test Playbook"
-    silent: true
     cmd: ansible-playbook -i inventory.yml ./playbooks/servers/test_hello_world.yml
 
   status:
     vars:
       SEPARATOR: ======================================
     desc: "Display Status of Infrastructure"
-    silent: true
     cmds:
       - echo -e "\n{{.SEPARATOR}} Compose Status {{.SEPARATOR}}\n"
       - docker compose ls
