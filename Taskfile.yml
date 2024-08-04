@@ -53,6 +53,11 @@ tasks:
     desc: "Run Hello World Test Playbook"
     cmd: ansible-playbook -i inventory.yml ./playbooks/servers/test_hello_world.yml
 
+  playbook-setup:
+    desc: Setup Required Applications and Services
+    cmds:
+      - ansible-playbook -i inventory.yml ./playbooks/servers/setup_apps_and_services.yml
+
   status:
     vars:
       SEPARATOR: ======================================
