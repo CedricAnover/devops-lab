@@ -1,0 +1,59 @@
+---
+- name: Setup & install required applications & services
+  hosts: servers
+  vars:
+    tailscale_env:
+      # Override these in Command-line
+      TS_AUTHKEY: ts-authkey
+  tasks:
+    - name: Install unzip
+      apt:
+        name: unzip
+        state: present
+      become: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install unzip
+      yum:
+        name: unzip
+        state: present
+      become: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Download Nomad binary
+      get_url:
+        url: https://releases.hashicorp.com/nomad/1.8.2/nomad_1.8.2_linux_amd64.zip
+        dest: /tmp/nomad_1.8.2_linux_amd64.zip
+    
+    - name: Download Consul binary
+      get_url:
+        url: https://releases.hashicorp.com/consul/1.19.1/consul_1.19.1_linux_amd64.zip
+        dest: /tmp/consul_1.19.1_linux_amd64.zip
+
+    - name: Extract Nomad binary
+      unarchive:
+        src: /tmp/nomad_1.8.2_linux_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+        creates: /usr/local/bin/nomad
+    
+    - name: Extract Consul binary
+      unarchive:
+        src: /tmp/consul_1.19.1_linux_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+        creates: /usr/local/bin/consul
+
+    - name: Run Tailscale Docker Container
+      become: yes
+      environment: "{{ tailscale_env }}"
+      shell: |
+        docker run -d \
+          --name=tailscaled \
+          -v /var/lib:/var/lib \
+          -v /dev/net/tun:/dev/net/tun \
+          --network=host \
+          --cap-add=NET_ADMIN \
+          --cap-add=NET_RAW \
+          --env TS_AUTHKEY="{{ TS_AUTHKEY }}" \
+          tailscale/tailscale

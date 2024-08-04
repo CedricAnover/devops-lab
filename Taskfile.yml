@@ -1,0 +1,76 @@
+version: '3'
+
+silent: true
+
+env:
+  ANSIBLE_EXE: "./.venv/bin/ansible"
+  ANSIBLE_PLAYBOOK_EXE: "./.venv/bin/ansible-playbook"
+
+dotenv: [".env"]
+
+tasks:
+  build:
+    desc: "Build Sysbox Image"
+    cmds: 
+      - docker build -t server -f Dockerfile.server .
+      - task: clean-danglings
+
+  generate-ssh-keys:
+    desc: Generate New SSH Key Pair
+    vars:
+      SSH_TYPE: rsa
+      ID_RSA_PATH: ./.ssh/id_rsa
+      SSH_USER: admin
+      SSH_HOST: controller
+    cmds:
+      - rm -rf ./.ssh/*
+      - ssh-keygen -t {{.SSH_TYPE}} -b 4096 -f {{.ID_RSA_PATH}} -C "{{.SSH_USER}}@{{.SSH_HOST}}" -N ""
+
+  clean-danglings:
+    desc: "Clean Docker Dangling Images"
+    cmd: docker image prune -f
+
+  clean:
+    desc: "Clean Server Image and Dangling Images"
+    deps:
+      - clean-danglings
+    cmds:
+      - docker rmi server 2>/dev/null || true
+
+  deploy:
+    desc: "Deploy Infrastructure Lab"
+    deps:
+      - destroy
+    cmds:
+      - docker compose up -d --force-recreate
+
+  destroy:
+    desc: "Destroy Infrastructure Lab"
+    cmd: docker compose down -v
+
+  ping:
+    desc: "Test by Ansible Ping"
+    cmd: $ANSIBLE_EXE -i inventory.yml all -m ping
+
+  test-hello-world:
+    desc: "Run Hello World Test Playbook"
+    cmd: $ANSIBLE_PLAYBOOK_EXE -i inventory.yml ./playbooks/servers/test_hello_world.yml
+
+  playbook-setup:
+    desc: Setup Required Applications and Services
+    vars:
+      TS_AUTHKEY: $DEVOPS_REUSE_EPH_TAG_SYSCONT
+    cmds:
+      - $ANSIBLE_PLAYBOOK_EXE -i inventory.yml --extra-vars TS_AUTHKEY={{.TS_AUTHKEY}} ./playbooks/servers/setup_apps_and_services.yml
+
+  status:
+    vars:
+      SEPARATOR: ======================================
+    desc: "Display Status of Infrastructure"
+    cmds:
+      - echo -e "\n{{.SEPARATOR}} Compose Status {{.SEPARATOR}}\n"
+      - docker compose ls
+      - echo -e "\n{{.SEPARATOR}} Process Status {{.SEPARATOR}}\n"
+      - docker ps
+      - echo -e "\n{{.SEPARATOR}} Network Status {{.SEPARATOR}}\n"
+      - docker network ls

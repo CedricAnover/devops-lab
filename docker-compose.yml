@@ -1,0 +1,31 @@
+
+networks:
+  devops_net:
+    name: devops-net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+
+services:
+  server_1:
+    image: server
+    container_name: server-1
+    hostname: server-1
+    runtime: sysbox-runc
+    stdin_open: true
+    tty: true
+    networks:
+      devops_net:
+        ipv4_address: 172.18.0.2
+  
+  server_2:
+    image: server
+    container_name: server-2
+    hostname: server-2
+    runtime: sysbox-runc
+    stdin_open: true
+    tty: true
+    networks:
+      devops_net:
+        ipv4_address: 172.18.0.3
