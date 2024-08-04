@@ -3,7 +3,9 @@ tasks:
   build:
     desc: "Build Sysbox Image"
     silent: true
-    cmd: docker build -t server -f Dockerfile.server .
+    cmds: 
+      - docker build -t server -f Dockerfile.server .
+      - task: clean-danglings
 
   clean-danglings:
     desc: "Clean Docker Dangling Images"
