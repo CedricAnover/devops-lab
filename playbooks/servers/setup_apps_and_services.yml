@@ -3,50 +3,10 @@
   hosts: servers
   vars:
     # Override these in Command-line
-    nomad_version: "1.8.2"
-    consul_version: "1.19.1"
     tailscale_env:
       TS_AUTHKEY: ts-authkey
   tasks:
-    - name: Install unzip
-      apt:
-        name: unzip
-        state: present
-      become: yes
-      when: ansible_os_family == "Debian"
-
-    - name: Install unzip
-      yum:
-        name: unzip
-        state: present
-      become: yes
-      when: ansible_os_family == "RedHat"
-
-    - name: Download Nomad binary
-      get_url:
-        url: https://releases.hashicorp.com/nomad/{{nomad_version}}/nomad_{{nomad_version}}_linux_amd64.zip
-        dest: /tmp/nomad_{{nomad_version}}_linux_amd64.zip
-    
-    - name: Download Consul binary
-      get_url:
-        url: https://releases.hashicorp.com/consul/{{consul_version}}/consul_{{consul_version}}_linux_amd64.zip
-        dest: /tmp/consul_{{consul_version}}_linux_amd64.zip
-
-    - name: Extract Nomad binary
-      unarchive:
-        src: /tmp/nomad_{{nomad_version}}_linux_amd64.zip
-        dest: /usr/local/bin
-        remote_src: yes
-        creates: /usr/local/bin/nomad
-    
-    - name: Extract Consul binary
-      unarchive:
-        src: /tmp/consul_{{consul_version}}_linux_amd64.zip
-        dest: /usr/local/bin
-        remote_src: yes
-        creates: /usr/local/bin/consul
-
-    - name: Run Tailscale Docker Container
+    - name: Run Tailscale Docker Container in System Container
       become: yes
       environment: "{{ tailscale_env }}"
       shell: |

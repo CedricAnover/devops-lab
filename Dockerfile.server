@@ -1,14 +1,27 @@
 # Note: We are currently the 'admin' user from sysbox
 FROM nestybox/ubuntu-jammy-systemd-docker
 
+# Versions
+ENV NOMAD_VERSION='1.8.2'
+ENV CONSUL_VERSION='1.19.1'
+
 # SSH Provisioning
 COPY ./.ssh/id_rsa.pub /home/admin/.ssh/authorized_keys
 
-# SSH Configurations
-RUN echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
-RUN echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config
-
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    git
+# SSH Configurations and package installations
+RUN echo "PasswordAuthentication no" >> /etc/ssh/sshd_config && \
+    echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config && \
+    apt-get update && apt-get install -y \
+        python3 \
+        python3-pip \
+        git \
+        unzip \
+        wget \
+        curl && \
+    wget -O /tmp/nomad_${NOMAD_VERSION}_linux_amd64.zip https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip && \
+    wget -O /tmp/consul_${CONSUL_VERSION}_linux_amd64.zip https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip && \
+    unzip -o /tmp/nomad_${NOMAD_VERSION}_linux_amd64.zip -d /tmp/ && \
+    mv /tmp/nomad /bin/nomad && \
+    unzip -o /tmp/consul_${CONSUL_VERSION}_linux_amd64.zip -d /tmp/ && \
+    mv /tmp/consul /bin/consul && \
+    rm /tmp/nomad_${NOMAD_VERSION}_linux_amd64.zip /tmp/consul_${CONSUL_VERSION}_linux_amd64.zip
