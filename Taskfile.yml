@@ -60,8 +60,46 @@ tasks:
     desc: Setup Required Applications and Services
     vars:
       TS_AUTHKEY: $DEVOPS_REUSE_EPH_TAG_SYSCONT
+      TAILNET_NAME: $TS_NET_NAME
     cmds:
       - $ANSIBLE_PLAYBOOK_EXE -i inventory.yml --extra-vars TS_AUTHKEY={{.TS_AUTHKEY}} ./playbooks/servers/setup_apps_and_services.yml
+      - $ANSIBLE_PLAYBOOK_EXE -i inventory.yml --extra-vars TAILNET_NAME={{.TAILNET_NAME}} ./playbooks/servers/configure_nomad_servers.yml
+      - $ANSIBLE_PLAYBOOK_EXE -i inventory.yml --extra-vars TAILNET_NAME={{.TAILNET_NAME}} ./playbooks/servers/configure_nomad_clients.yml
+
+  nomad-start:
+    desc: Start Nomad Agents (Servers and Clients)
+    cmds:
+      # TODO: Generalize and Parameterize Nomad Agent Initialization
+      - docker exec -d -it server-1 /bin/bash -c 'nomad agent -config=/server.hcl'
+      - docker exec -d -it server-2 /bin/bash -c 'nomad agent -config=/client.hcl'
+  
+  nomad-job-run:
+    desc: Run Nomad HCL2 Jobspec
+    summary: |
+      Usage:
+        $ task nomad-job-run -- <ARGS>
+        $ task nomad-job-run -- path/to/jobspec.nomad.hcl
+    vars:
+      TAILNET_NAME: $TS_NET_NAME
+    env:
+      NOMAD_ADDR: http://server-1.{{.TAILNET_NAME}}.ts.net:4646
+    cmds:
+      - nomad job run {{.CLI_ARGS}}
+
+  nomad-sample:
+    desc: Nomad Sample from Hashicorp
+    summary: |
+      URL: https://developer.hashicorp.com/nomad/tutorials/get-started/gs-start-a-cluster
+    vars:
+      TAILNET_NAME: $TS_NET_NAME
+    env:
+      NOMAD_ADDR: http://server-1.{{.TAILNET_NAME}}.ts.net:4646
+    cmds:
+      - nomad job run ./nomad-jobs/pytechco-redis.nomad.hcl
+      - nomad job run ./nomad-jobs/pytechco-web.nomad.hcl
+      - nomad job run ./nomad-jobs/pytechco-setup.nomad.hcl
+      - nomad job dispatch -meta budget="200" pytechco-setup
+      - nomad job run ./nomad-jobs/pytechco-employee.nomad.hcl
 
   status:
     vars:

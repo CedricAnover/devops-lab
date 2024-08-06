@@ -1,0 +1,31 @@
+---
+# TODO: Parameterize Container Names and Ansible Machine Names
+- hosts: server_2
+  become: yes
+  vars:
+    # Override these
+    TAILNET_NAME: tailnet
+  tasks:
+  - name: Configure client.hcl for nomad clients
+    copy:
+      dest: "/client.hcl"
+      content: |
+        data_dir = "/opt/nomad/data"
+        bind_addr = "0.0.0.0"
+        advertise {
+          http = "server-1.{{TAILNET_NAME}}.ts.net:4646"
+          rpc  = "server-1.{{TAILNET_NAME}}.ts.net:4647"
+          serf = "server-1.{{TAILNET_NAME}}.ts.net:4648"
+        }
+        server {
+          enabled          = false
+        }
+        client {
+          enabled       = true
+          servers = ["server-1.{{TAILNET_NAME}}.ts.net:4647"]
+        }
+        plugin "raw_exec" {
+          config {
+            enabled = true
+          }
+        }
