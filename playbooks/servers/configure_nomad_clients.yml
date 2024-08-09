@@ -22,7 +22,7 @@
         }
         client {
           enabled       = true
-          servers = ["server-1.{{TAILNET_NAME}}.ts.net:4647"]
+          servers = ["server-1.{{TAILNET_NAME}}.ts.net"]
         }
         plugin "raw_exec" {
           config {
